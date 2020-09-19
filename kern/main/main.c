@@ -2,6 +2,10 @@
  * Main.
  */
 
+/*
+ * Miguel's main.c
+ */
+
 #include <types.h>
 #include <kern/errno.h>
 #include <kern/unistd.h>
@@ -66,8 +70,11 @@ boot(void)
 	kprintf("%s", harvard_copyright);
 	kprintf("\n");
 
-	kprintf("Put-your-group-name-here's system version %s (%s #%d)\n", 
+	kprintf("Miguel Cubas Lopez's system version %s (%s #%d)\n", 
 		GROUP_VERSION, buildconfig, buildversion);
+
+	hello();
+
 	kprintf("\n");
 
 	ram_bootstrap();
