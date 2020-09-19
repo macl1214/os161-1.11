@@ -31,6 +31,7 @@ mips_interrupt(u_int32_t cause)
 		panic("Received NMI\n");
 	}
 	else {
+		DEBUG(DB_INTERRUPT, "interrupt: fault: 0x%x\n", cause);
 		panic("Unknown interrupt; cause register is %08x\n", cause);
 	}
 
