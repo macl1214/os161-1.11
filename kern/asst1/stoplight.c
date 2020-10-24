@@ -32,11 +32,6 @@
 
 #define NVEHICLES 20
 
-
-// static struct lock A;
-// static struct lock B;
-// static struct lock C;
-
 static struct lock *AB;
 static struct lock *BC;
 static struct lock *CA;
@@ -90,8 +85,6 @@ const char* getVehicleType(int vehicletype) {
  *      Write and comment this function.
  */
 
-
-
 static
 void
 turnleft(unsigned long vehicledirection,
@@ -103,69 +96,56 @@ turnleft(unsigned long vehicledirection,
 	if (vehicledirection == 0) 					// A
 	{ 
 		kprintf("Vehicle #%02lu - %5s - from A: approaching the intersection. Destination direction: C\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from A: %5s, Vehicle Number: %02lu, Destination direction: C\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 1*/
 		lock_acquire(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: entering the intersection CA. Destination direction: C\n", vehiclenumber, type);
-		//kprintf("Entering intersection AB: %5s, Vehicle Number: %02lu,  Destination direction: C\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(BC);
 		lock_release(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: leaving AB and entering BC. Destination direction: C\n", vehiclenumber, type);
-		//kprintf("Leaving intersection AB and entering intersection BC: %5s, Vehicle Number: %02lu, Destination direction: C\n", type, vehiclenumber);
 
 		/** Lock release 2 */
 		lock_release(BC);
 		kprintf("Vehicle #%02lu - %5s - from A: exiting the intersection and arriving at C\n", vehiclenumber, type);
-		//kprintf("Leaving intersection BC and exiting through direction C: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);	
 	}
 
 	else if (vehicledirection == 1) 		// B
 	{ 
 		kprintf("Vehicle #%02lu - %5s - from B: approaching the intersection. Destination direction: A\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from B: %5s, Vehicle Number: %02lu, Destination direction: A\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 1*/
 		lock_acquire(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: entering the intersection BC. Destination direction: A\n", vehiclenumber, type);
-		//kprintf("Entering intersection BC: %5s, Vehicle Number: %02lu,  Destination direction: A\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(CA);
 		lock_release(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: leaving BC and entering CA. Destination direction: A\n", vehiclenumber, type);
-		//kprintf("Leaving intersection BC and entering intersection CA: %5s, Vehicle Number: %02lu, Destination direction: A\n", type, vehiclenumber);
 
 		/** Lock release 2 */
 		lock_release(CA);
 		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection CA and arriving at A\n", vehiclenumber, type);
-		//kprintf("Leaving intersection CA and exiting through direction A: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);	
 	}
 
 	else 															// C
 	{
 		kprintf("Vehicle #%02lu - %5s - from C: approaching the intersection. Destination direction: B\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from C: %5s, Vehicle Number: %02lu, Destination direction: B\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 1*/
 		lock_acquire(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: entering the intersection CA. Destination direction: B\n", vehiclenumber, type);
-		//kprintf("Entering intersection CA: %5s, Vehicle Number: %02lu,  Destination direction: B\n", type, vehiclenumber);
-			
+
 		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(AB);
 		lock_release(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: leaving CA and entering AB. Destination direction: B\n", vehiclenumber, type);
-		//kprintf("Leaving intersection CA and entering intersection AB: %5s, Vehicle Number: %02lu, Destination direction: A\n", type, vehiclenumber);
 
 		/** Lock release 2 */
 		lock_release(AB);
 		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection AB and arriving at B\n", vehiclenumber, type);
-		//kprintf("Leaving intersection AB and exiting through direction B: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);	
 	}
-
 }
 
 
@@ -192,64 +172,45 @@ turnright(unsigned long vehicledirection,
 		unsigned long vehiclenumber,
 		unsigned long vehicletype)
 {
-	/*
-	 * Avoid unused variable warnings.
-	 */
-
-//	(void) vehicledirection;
-//	(void) vehiclenumber;
-//	(void) vehicletype;
-
 	const char *type = getVehicleType(vehicletype);
 
 	if (vehicledirection == 0) 							// A
 	{	
 		kprintf("Vehicle #%02lu - %5s - from A: approaching the intersection. Destination direction: B\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from A: %5s, Vehicle Number: %02lu, Destination direction: B\n", type, vehiclenumber);
-			
+
 		/** Acquire lock */
 		lock_acquire(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: entering the intersection AB. Destination direction: B\n", vehiclenumber, type);
-		//kprintf("Entering intersection AB: %5s, Vehicle Number: %02lu,  Destination direction: B\n", type, vehiclenumber);
-			
+
 		/** Release lock */
 		lock_release(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: leaving intersection AB and arriving at B\n", vehiclenumber, type);
-		//kprintf("Leaving intersection AB and exiting through direction B: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);
 	}
 	
 	else if (vehicledirection == 1)					// B
 	{
 		kprintf("Vehicle #%02lu - %5s - from B: approaching the intersection. Destination direction: C\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from B: %5s, Vehicle Number: %02lu, Destination direction: C\n", type, vehiclenumber);
-			
+
 		/** Acquire lock */
 		lock_acquire(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: entering the intersection BC. Destination direction: C\n", vehiclenumber, type);
-		//kprintf("Entering intersection BC: %5s, Vehicle Number: %02lu, Destination direction: C\n", type, vehiclenumber);
-			
+
 		/** Release lock */
 		lock_release(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection BC and arriving at C\n", vehiclenumber, type);
-		//kprintf("Leaving intersection BC and exiting through direction C: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);
 	}
 	
 	else																		// C 
 	{
-
 		kprintf("Vehicle #%02lu - %5s - from C: approaching the intersection. Destination direction: A\n", vehiclenumber, type);
-		//kprintf("Approaching the intersection from C: %5s, Vehicle Number: %02lu, Destination direction: A\n", type, vehiclenumber);
-			
+
 		/** Acquire lock */
 		lock_acquire(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: entering the intersection CA. Destination direction: A\n", vehiclenumber, type);
-		//kprintf("Entering intersection CA: %5s, Vehicle Number: %02lu, Destination direction: A\n", type, vehiclenumber);
-			
+
 		/** Release lock */
 		lock_release(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection CA and arriving at A\n", vehiclenumber, type);
-		//kprintf("Leaving intersection CA and exiting through direction A: %5s, Vehicle Number: %02lu\n", type, vehiclenumber);
-
 	}
 	
 }
@@ -300,10 +261,6 @@ approachintersection(void * unusedpointer,
 	 */
 
 	(void) unusedpointer;
-//	(void) vehiclenumber;
-//	(void) turnleft;
-//	(void) turnright;
-
 	/*
 	 * vehicledirection is set randomly.
 	 */
