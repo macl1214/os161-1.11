@@ -116,6 +116,8 @@ lock_create(const char *name)
 	
 	// add stuff here as needed
 	
+	lock->mutex = 1;
+	lock->l_holder = NULL;
 	return lock;
 }
 
@@ -125,17 +127,35 @@ lock_destroy(struct lock *lock)
 	assert(lock != NULL);
 
 	// add stuff here as needed
+
+	int spl = splhigh();
 	
-	kfree(lock->name);
-	kfree(lock);
+	if (lock_do_i_hold(lock)) {
+		if (thread_hassleepers(lock) == 0) {
+			kfree(lock->name);
+			kfree(lock);
+		}
+	}
+
+	splx(spl);
 }
 
 void
 lock_acquire(struct lock *lock)
 {
 	// Write this
+	int spl = splhigh();
+	
+	while (lock->mutex == 0) {
+		thread_sleep(lock);
+	}
 
-	(void)lock;  // suppress warning until code gets written
+	assert(lock->mutex > 0);	
+	lock->mutex = 0;
+	lock->l_holder = curthread;
+
+	splx(spl);	
+//	(void)lock;  // suppress warning until code gets written
 }
 
 void
@@ -143,7 +163,17 @@ lock_release(struct lock *lock)
 {
 	// Write this
 
-	(void)lock;  // suppress warning until code gets written
+	int spl = splhigh();
+
+	
+	assert(lock_do_i_hold(lock));
+	
+	lock->mutex = 1;
+	lock->l_holder = NULL;
+	thread_wakeup(lock);	
+
+	splx(spl);
+//	(void)lock;  // suppress warning until code gets written
 }
 
 int
@@ -151,9 +181,14 @@ lock_do_i_hold(struct lock *lock)
 {
 	// Write this
 
-	(void)lock;  // suppress warning until code gets written
-
-	return 1;    // dummy until code gets written
+	if (lock->mutex == 0 && lock->l_holder == curthread) {
+		return 1;
+	}
+	else {	
+		return 0; 
+	}
+//	(void)lock;  // suppress warning until code gets written
+//	return 1;    // dummy until code gets written
 }
 
 ////////////////////////////////////////////////////////////
