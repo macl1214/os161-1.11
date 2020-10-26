@@ -26,17 +26,32 @@
  *
  */
 
+
+
+struct Route {
+	int cars; //= 0; throws error, cant have predefined vars in structs
+  struct lock *high_p; //threw error until static keywords removed
+  struct lock *low_p;
+};
+
 /*
  * Number of vehicles created.
  */
 
 #define NVEHICLES 20
 
+/*
+ * Variable declarations
+ */
+
+struct Route *A;
+struct Route *B;
+struct Route *C;
 static struct lock *AB;
 static struct lock *BC;
 static struct lock *CA;
-static struct lock *priority;
-static struct lock *left;
+static struct lock *getLocks;
+static int nvrem;	// Number of vehicles remaining
 
 /*
  *
@@ -85,6 +100,8 @@ const char* getVehicleType(int vehicletype) {
  *      Write and comment this function.
  */
 
+
+
 static
 void
 turnleft(unsigned long vehicledirection,
@@ -94,58 +111,117 @@ turnleft(unsigned long vehicledirection,
 	const char *type = getVehicleType(vehicletype);
 
 	if (vehicledirection == 0) 					// A
-	{ 
+	{ 	
 		kprintf("Vehicle #%02lu - %5s - from A: approaching the intersection. Destination direction: C\n", vehiclenumber, type);
-
-		/** Acquire lock 1*/
+		
+		if(vehicletype == 0){
+			lock_acquire(A->low_p);
+			while(A->cars > 0){
+				thread_yield();
+			}
+		}
+	
+		/** Acquire locks*/
+		lock_acquire(getLocks);
 		lock_acquire(AB);
-		kprintf("Vehicle #%02lu - %5s - from A: entering the intersection CA. Destination direction: C\n", vehiclenumber, type);
-
-		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(BC);
-		lock_release(AB);
+		kprintf("Vehicle #%02lu - %5s - from A: entering the intersection AB. Destination direction: C\n", vehiclenumber, type);
+		lock_release(getLocks);
+
+		if(vehicletype == 1){
+			A->cars--;
+		}
+
+		/** Release locks: AB -> BC*/
 		kprintf("Vehicle #%02lu - %5s - from A: leaving AB and entering BC. Destination direction: C\n", vehiclenumber, type);
+		lock_release(AB);
+//		kprintf("Vehicle #%02lu - %5s - from A: leaving AB and entering BC. Destination direction: C\n", vehiclenumber, type);
+
 
 		/** Lock release 2 */
-		lock_release(BC);
 		kprintf("Vehicle #%02lu - %5s - from A: exiting the intersection and arriving at C\n", vehiclenumber, type);
+		lock_release(BC);
+//		kprintf("Vehicle #%02lu - %5s - from A: exiting the intersection and arriving at C\n", vehiclenumber, type);	
+
+		if(vehicletype == 0){
+			lock_release(A->low_p);
+		}	
 	}
 
 	else if (vehicledirection == 1) 		// B
 	{ 
 		kprintf("Vehicle #%02lu - %5s - from B: approaching the intersection. Destination direction: A\n", vehiclenumber, type);
 
-		/** Acquire lock 1*/
+		if(vehicletype == 0){
+			lock_acquire(B->low_p);
+			while(B->cars > 0){
+				thread_yield();
+			}
+		}
+				
+		/** Acquire locks*/
+		lock_acquire(getLocks);
 		lock_acquire(BC);
-		kprintf("Vehicle #%02lu - %5s - from B: entering the intersection BC. Destination direction: A\n", vehiclenumber, type);
-
-		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(CA);
-		lock_release(BC);
-		kprintf("Vehicle #%02lu - %5s - from B: leaving BC and entering CA. Destination direction: A\n", vehiclenumber, type);
+		kprintf("Vehicle #%02lu - %5s - from B: entering the intersection BC. Destination direction: A\n", vehiclenumber, type);
+		lock_release(getLocks);
 
+		if(vehicletype == 1){
+			B->cars--;
+		}
+			
+		/** Release locks: BC -> CA*/
+		kprintf("Vehicle #%02lu - %5s - from B: leaving BC and entering CA. Destination direction: A\n", vehiclenumber, type);
+		lock_release(BC);
+//		kprintf("Vehicle #%02lu - %5s - from B: leaving BC and entering CA. Destination direction: A\n", vehiclenumber, type);
+		
 		/** Lock release 2 */
-		lock_release(CA);
 		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection CA and arriving at A\n", vehiclenumber, type);
+		lock_release(CA);
+//		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection CA and arriving at A\n", vehiclenumber, type);
+
+		if(vehicletype == 0){
+			lock_release(B->low_p);
+		}
 	}
 
 	else 															// C
 	{
 		kprintf("Vehicle #%02lu - %5s - from C: approaching the intersection. Destination direction: B\n", vehiclenumber, type);
 
-		/** Acquire lock 1*/
+		if(vehicletype == 0){
+			lock_acquire(C->low_p);
+			while(C->cars > 0){
+				thread_yield();
+			}
+		}
+			
+		/** Acquire locks*/
+		lock_acquire(getLocks);
 		lock_acquire(CA);
-		kprintf("Vehicle #%02lu - %5s - from C: entering the intersection CA. Destination direction: B\n", vehiclenumber, type);
-
-		/** Acquire lock 2 and release lock 1*/
 		lock_acquire(AB);
-		lock_release(CA);
+		kprintf("Vehicle #%02lu - %5s - from C: entering the intersection CA. Destination direction: B\n", vehiclenumber, type);
+		lock_release(getLocks);
+
+		if(vehicletype == 1){
+			C->cars--;
+		}
+
+		/** Release locks: CA -> AB*/
 		kprintf("Vehicle #%02lu - %5s - from C: leaving CA and entering AB. Destination direction: B\n", vehiclenumber, type);
+		lock_release(CA);
+//		kprintf("Vehicle #%02lu - %5s - from C: leaving CA and entering AB. Destination direction: B\n", vehiclenumber, type);
 
 		/** Lock release 2 */
-		lock_release(AB);
 		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection AB and arriving at B\n", vehiclenumber, type);
+		lock_release(AB);
+//		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection AB and arriving at B\n", vehiclenumber, type);	
+
+		if(vehicletype == 0){
+			lock_release(C->low_p);
+		}	
 	}
+
 }
 
 
@@ -178,39 +254,94 @@ turnright(unsigned long vehicledirection,
 	{	
 		kprintf("Vehicle #%02lu - %5s - from A: approaching the intersection. Destination direction: B\n", vehiclenumber, type);
 
+		//PRIORITY ALGORITHM
+		if(vehicletype == 0){
+			//lock_acquire(getLocks);
+			lock_acquire(A->low_p);
+			while(A->cars > 0){
+				thread_yield();
+				/*int spl = splhigh();
+				thread_sleep(A->low_p);
+				splx(spl);*/
+			}
+		}
+			
 		/** Acquire lock */
 		lock_acquire(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: entering the intersection AB. Destination direction: B\n", vehiclenumber, type);
-
+		
+		if(vehicletype == 1){
+			A->cars--;
+		}
+	
 		/** Release lock */
-		lock_release(AB);
 		kprintf("Vehicle #%02lu - %5s - from A: leaving intersection AB and arriving at B\n", vehiclenumber, type);
+		lock_release(AB);
+//		kprintf("Vehicle #%02lu - %5s - from A: leaving intersection AB and arriving at B\n", vehiclenumber, type);
+		
+		if(vehicletype == 0){
+			lock_release(A->low_p);
+		}
 	}
 	
 	else if (vehicledirection == 1)					// B
 	{
 		kprintf("Vehicle #%02lu - %5s - from B: approaching the intersection. Destination direction: C\n", vehiclenumber, type);
 
+		if(vehicletype == 0){
+			lock_acquire(B->low_p);
+			while(B->cars > 0){
+				thread_yield();
+			}
+		}
+		
 		/** Acquire lock */
 		lock_acquire(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: entering the intersection BC. Destination direction: C\n", vehiclenumber, type);
 
+		if(vehicletype == 1){
+			B->cars--;
+		}
+			
 		/** Release lock */
-		lock_release(BC);
 		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection BC and arriving at C\n", vehiclenumber, type);
+		lock_release(BC);
+//		kprintf("Vehicle #%02lu - %5s - from B: leaving intersection BC and arriving at C\n", vehiclenumber, type);
+	
+		if(vehicletype == 0){
+			lock_release(B->low_p);
+		}		
 	}
 	
 	else																		// C 
 	{
+
 		kprintf("Vehicle #%02lu - %5s - from C: approaching the intersection. Destination direction: A\n", vehiclenumber, type);
 
+		if(vehicletype == 0){
+			lock_acquire(C->low_p);
+			while(C->cars > 0){
+				thread_yield();
+			}
+		}
+
+			
 		/** Acquire lock */
 		lock_acquire(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: entering the intersection CA. Destination direction: A\n", vehiclenumber, type);
 
+		if(vehicletype == 1){
+			C->cars--;
+		}
+			
 		/** Release lock */
-		lock_release(CA);
 		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection CA and arriving at A\n", vehiclenumber, type);
+		lock_release(CA);
+//		kprintf("Vehicle #%02lu - %5s - from C: leaving intersection CA and arriving at A\n", vehiclenumber, type);
+
+		if(vehicletype == 0){
+			lock_release(C->low_p);
+		}
 	}
 	
 }
@@ -261,24 +392,47 @@ approachintersection(void * unusedpointer,
 	 */
 
 	(void) unusedpointer;
+
 	/*
 	 * vehicledirection is set randomly.
 	 */
 
 	vehicledirection = random() % 3;
-//	turndirection = random() % 2;
-	turndirection = 0;
+//	vehicledirection = 0;
+	turndirection = random() % 2;
+//	turndirection = 0;
 	vehicletype = random() % 2;
 
-			
+	if(vehicledirection == 0){
+		if(vehicletype == 1){
+			lock_acquire(getLocks);
+			A->cars++;
+			lock_release(getLocks);
+		}
+	}else if(vehicledirection == 1){
+		if(vehicletype == 1){
+			lock_acquire(getLocks);
+			B->cars++;
+			lock_release(getLocks);
+		}
+	}else if(vehicledirection == 2){
+		if(vehicletype == 1){
+			lock_acquire(getLocks);
+			C->cars++;
+			lock_release(getLocks);
+		}
+	}			
 
 	if (turndirection == 0) {
 		turnright(vehicledirection, vehiclenumber, vehicletype);
 	}
 	else {
 		turnleft(vehicledirection, vehiclenumber, vehicletype);
+    //turnleft(vehicledirection, vehiclenumber, vehicletype);
 	}
 
+	/** Keep track of the number of vehicles left to go through the intersection */
+	nvrem -= 1;	 
 }
 
 
@@ -310,6 +464,14 @@ createvehicles(int nargs,
 	(void) nargs;
 	(void) args;
 	
+  /*
+   * Initialize structs
+   */
+  
+	A = kmalloc(sizeof(struct Route));
+	B = kmalloc(sizeof(struct Route));
+	C = kmalloc(sizeof(struct Route));
+  
 	/*
  	 * Create all locks
  	 */
@@ -317,8 +479,20 @@ createvehicles(int nargs,
 	AB = lock_create("AB");
 	BC = lock_create("BC");
 	CA = lock_create("AC");
-  left = lock_create("left");
-	priority = lock_create("priority");
+  
+  A->cars = 0;
+	A->high_p = lock_create("high priority");
+	A->low_p = lock_create("low priority");
+  
+  B->cars = 0;
+	B->high_p = lock_create("high priority");
+	B->low_p = lock_create("low priority");
+  
+	C->cars = 0;
+	C->high_p = lock_create("high priority");
+	C->low_p = lock_create("low priority");
+	getLocks = lock_create("getLocks");
+	nvrem = NVEHICLES;	// Initially 20 vehicles that need to go through the intersection
 
 	/*
 	 * Start NVEHICLES approachintersection() threads.
@@ -333,8 +507,6 @@ createvehicles(int nargs,
 				NULL
 				);
 
-		kprintf("\t\t*****\n\tCar %02d is done!\n\t\t*****\n", index);		
-
 		/*
 		 * panic() on error.
 		 */
@@ -347,11 +519,26 @@ createvehicles(int nargs,
 		}
 	}
 
+	/*
+	 * Only begin to destroy the locks once all of the vehicles 
+	 * have turned and have exited into their destination.
+	 *
+	 * Loop is used to make sure this happens. 
+	 *
+	 */
+
+	while (nvrem != 0);	
+
 	lock_destroy(AB);
 	lock_destroy(BC);
 	lock_destroy(CA);
-	lock_destroy(left);
-	lock_destroy(priority);
+	lock_destroy(getLocks);
+	lock_destroy(A->high_p);
+	lock_destroy(A->low_p);
+	lock_destroy(B->high_p);
+	lock_destroy(B->low_p);
+	lock_destroy(C->high_p);
+	lock_destroy(C->low_p);
 
 	return 0;
 }
