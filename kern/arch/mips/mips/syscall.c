@@ -69,15 +69,39 @@ mips_syscall(struct trapframe *tf)
 
 	switch (callno) {
 	    case SYS_reboot:
-		err = sys_reboot(tf->tf_a0);
-		break;
+				err = sys_reboot(tf->tf_a0);
+				break;
 
 	    /* Add stuff here */
- 
+
+			case SYS_getpid:
+				err = sys_getpid(&retval);
+				break;
+
+			case SYS_getppid:
+				
+				break; 
+
+			case SYS_fork:
+				
+				break;
+
+			case SYS_execv:
+				
+				break;
+
+			case SYS_waitpid:
+				
+				break;
+
+			case SYS_exit:
+				
+				break;
+
 	    default:
-		kprintf("Unknown syscall %d\n", callno);
-		err = ENOSYS;
-		break;
+				kprintf("Unknown syscall %d\n", callno);
+				err = ENOSYS;
+				break;
 	}
 
 

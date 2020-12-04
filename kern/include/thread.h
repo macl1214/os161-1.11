@@ -7,6 +7,7 @@
 
 /* Get machine-dependent stuff */
 #include <machine/pcb.h>
+#include "kern/types.h"
 
 
 struct addrspace;
@@ -20,10 +21,24 @@ struct thread {
 	char *t_name;
 	const void *t_sleepaddr;
 	char *t_stack;
-	
+
 	/**********************************************************/
 	/* Public thread members - can be used by other code      */
 	/**********************************************************/
+
+	/*
+ 	 * PID: process ID
+ 	 * PPID: parent process ID
+ 	 *
+ 	 * The PID will be used to determine which process each 
+ 	 * thread is associated with by looking up the PID in the 
+ 	 * process table. 
+ 	 *
+ 	 * Added for PA2 by Miguel and Elijah.
+ 	 */
+
+	pid_t pid;
+	pid_t ppid;
 	
 	/*
 	 * This is public because it isn't part of the thread system,
