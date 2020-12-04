@@ -73,7 +73,7 @@ boot(void)
 	kprintf("Miguel Cubas Lopez's system version %s (%s #%d)\n", 
 		GROUP_VERSION, buildconfig, buildversion);
 
-	hello();
+	//hello();
 
 	kprintf("\n");
 

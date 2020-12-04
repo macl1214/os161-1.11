@@ -22,6 +22,8 @@ struct process {
 	pid_t pid;							// pid
 	pid_t p_pid;						// parent pid
 	struct thread* thrds;		// threads associated with the process
+
+	struct process *wait;	//pointer to process that this is waiting on
  
 	int has_exited;					// exit status
 	int exitcode;						// exit code

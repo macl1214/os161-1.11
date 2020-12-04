@@ -132,7 +132,7 @@ mips_syscall(struct trapframe *tf)
 }
 
 void
-md_forkentry(struct trapframe *tf)
+md_forkentry(struct trapframe *tf, struct trapframe *child_tf)
 {
 	/*
 	 * This function is provided as a reminder. You need to write
@@ -141,5 +141,10 @@ md_forkentry(struct trapframe *tf)
 	 * Thus, you can trash it and do things another way if you prefer.
 	 */
 
-	(void)tf;
+	memcopy(child_tf, tf, sizeof(struct trapframe));
+
+	curthread->pid = tf->tf_v0;
+	child_tf->tf_v0 = 0;
+	child_tf->tf_a3 = 0;
+	child_tf->tf_epc += 4;
 }

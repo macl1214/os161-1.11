@@ -2,10 +2,10 @@
 #define _KERN_CALLNO_H_
 
 /*
- * System call numbers.
- * Caution: this file is parsed by a shell script to generate the assembly
- * language system call stubs. Don't add weird stuff between the markers.
- */
+ *  * System call numbers.
+ *   * Caution: this file is parsed by a shell script to generate the assembly
+ *    * language system call stubs. Don't add weird stuff between the markers.
+ *     */
 
 /*CALLBEGIN*/
 #define SYS__exit        0
