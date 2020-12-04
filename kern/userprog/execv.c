@@ -1,11 +1,9 @@
-<<<<<<< HEAD
 /** execv.c */
 
 /*
  * Function: sys_execv()
  *
  */
-=======
 #include <types.h>
 #include <kern/unistd.h>
 #include <kern/errno.h>
@@ -70,4 +68,3 @@ int execv(const char* path, char* const argv[]){
 	panic("md_usermode returned\n");
 	return EINVAL;
 }
->>>>>>> 72c8fd594abbf4b45b34386953b5fdea273a586b

@@ -39,6 +39,8 @@ struct thread {
 
 	pid_t pid;
 	pid_t ppid;
+
+	struct process *wait;
 	
 	/*
 	 * This is public because it isn't part of the thread system,
