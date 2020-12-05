@@ -362,10 +362,11 @@ file      fs/vfs/devnull.c
 #
 
 file      thread/hardclock.c
+file      thread/process.c
 file      thread/synch.c
 file      thread/scheduler.c
 file      thread/thread.c
-file	  thread/process_table.c
+file	    thread/process_table.c
 
 #
 # Main/toplevel stuff
@@ -384,7 +385,7 @@ file			main/hello.c
 file      userprog/loadelf.c
 file      userprog/runprogram.c
 file      userprog/uio.c
-# file      userprog/getpid.c
+file      userprog/getpid.c
 # file      userprog/getppid.c
 # file      userprog/fork.c
 # file      userprog/execv.c

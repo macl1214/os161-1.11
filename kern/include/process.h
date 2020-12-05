@@ -5,14 +5,18 @@
  * Definition of a process
  */
 
+
 /* Get machine-dependent stuff */
+#include <array.h>
 #include <machine/pcb.h>
 #include "kern/types.h"
 
 /*
  * Max number of processes
  */
-#define MAX_P 2048
+#define MAX_P 256
+
+struct array *process_table;
 
 struct process {
 	/************************************************************/
@@ -23,26 +27,24 @@ struct process {
 	pid_t p_pid;						// parent pid
 	struct thread* thrds;		// threads associated with the process
 
-	struct process *wait;	//pointer to process that this is waiting on
+	//	struct process *wait;		// pointer to process that this is waiting on
  
 	int has_exited;					// exit status
 	int exitcode;						// exit code
 
 };
 
-struct process_table {
-	pid_t pid;
-	
-}
-
 /** Call once during startup to allocate data structures */
 struct process *process_bootstrap(void);
 
-/** Generate pid for a process */
-pid_t gen_pid();
+/** Create a process and return the PID */
+pid_t process_create();
 
-/** Call to check if pid exists */
-int check_pid(pid_t pid);
+/** Call to find empty spot in process table and return index */
+int find_space();
+
+/** Call to retrieve process (Used to get from process table) */
+struct process* get_process(pid_t pid);
 
 /** Remove a process */
 int remove_process(pid_t pid);

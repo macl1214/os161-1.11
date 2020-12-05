@@ -1,4 +1,20 @@
-pid_t sys_fork(struct trapframe *parent_tf){
+/* fork.c */
+
+/*
+ * Function: sys_fork()
+ *
+ */
+
+#include <types.h>
+#include <syscalls.h>
+#include <process.h>
+#include <thread.h>
+#include <curthread.h>
+
+
+pid_t 
+sys_fork(struct trapframe *parent_tf)
+{
 	struct trapframe *child_tf = malloc(sizeof(struct trapframe));
 	struct addrspace *child_addrspace = malloc(struct addrspace);
 

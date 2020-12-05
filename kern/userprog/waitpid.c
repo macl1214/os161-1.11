@@ -7,7 +7,7 @@
  *  Return: pid, assign pointer status containing exit code
  */
 
-int sys_waitpid(pid_t pid, userptr_t status, int options, int *ret){
+int sys_waitpid(pid_t pid, userptr_t status, int options, int *retval){
 	/*
  	* Get child process with pid
  	* check if calling process is pointing to child process with wait pointer
@@ -39,8 +39,12 @@ int sys_waitpid(pid_t pid, userptr_t status, int options, int *ret){
 	//assume this is found calling process
 	struct process *calling_p;
 
-	//define calling process waiting on child process
-	calling_p->wait = child_p;
+	// Get process that is calling waitpid from the process table
+	// If pid is not found, return -1 and set error code to EINVAL
+	if ((calling_p = get_process(pid)) == NULL) {
+		retval = EINVAL;
+		return -1;
+	}
 
 	//check if child process has exited and has exit code
 	while(child_p->has_exit == NULL && child_p->exitcode == NULL){

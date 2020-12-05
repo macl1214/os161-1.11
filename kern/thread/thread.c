@@ -61,6 +61,9 @@ thread_create(const char *name)
 	
 	// If you add things to the thread structure, be sure to initialize
 	// them here.
+
+	thread->pid = get_pid(thread);
+	thread->ppid = ;
 	
 	return thread;
 }
@@ -164,6 +167,9 @@ thread_panic(void)
 }
 
 /*
+ * Thread initialization.
+ */
+struct thread *
  * Thread initialization.
  */
 struct thread *
@@ -479,9 +485,6 @@ thread_yield(void)
 
 	mi_switch(S_READY);
 	splx(spl);
-}
-
-/*
  * Yield the cpu to another process, and go to sleep, on "sleep
  * address" ADDR. Subsequent calls to thread_wakeup with the same
  * value of ADDR will make the thread runnable again. The address is
