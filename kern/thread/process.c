@@ -31,6 +31,10 @@ process_create(pid_t pid)
 
 	index = find_space();
 
+	if (index >= MAX_P) {
+		return 0;
+	}
+
 	process_table[index] = kmalloc(sizeof(struct process));
 	
 	process_table[index]->pid = 0;
