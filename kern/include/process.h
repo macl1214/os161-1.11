@@ -16,8 +16,6 @@
  */
 #define MAX_P 256
 
-struct array *process_table;
-
 struct process {
 	/************************************************************/
 	/* Private process members - internal to the process system */

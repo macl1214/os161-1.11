@@ -6,12 +6,12 @@
  */
 
 int sys_reboot(int code);
-int sys_getpid();
-int sys_getppid();
-int sys_fork();
-int sys_execv();
-int sys_waitpid();
-int sys_exit();
+int sys_getpid(pid_t *retval);
+int sys_getppid(pid_t *retval);
+int sys_fork(struct trapframe *parent_tf, pid_t *retval);
+int sys_execv(const char* path, char* const argv[]);
+int sys_waitpid(pid_t pid, userptr_t, int options, int *retval);
+int sys__exit(int exitcode);
 
 
 #endif /* _SYSCALL_H_ */
