@@ -37,14 +37,14 @@ process_create(pid_t pid)
 
 	process_table[index] = kmalloc(sizeof(struct process));
 	
-	process_table[index]->pid = 0;
+	process_table[index]->pid = index;
 	process_table[index]->ppid = pid;
 	process_table[index]->has_exited = 0;
 	process_table[index]->exitcode = -1;
 
 	child_pid = index+1;	// To avoid having a process with a PID of 0
 
-	return child_pid;
+	return index;
 }
 
 /*
