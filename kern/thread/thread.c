@@ -170,9 +170,6 @@ thread_panic(void)
  * Thread initialization.
  */
 struct thread *
- * Thread initialization.
- */
-struct thread *
 thread_bootstrap(void)
 {
 	struct thread *me;
