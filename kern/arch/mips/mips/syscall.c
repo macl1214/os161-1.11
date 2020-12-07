@@ -51,6 +51,7 @@ mips_syscall(struct trapframe *tf)
 	int callno;
 	int32_t retval;
 	int err;
+	unsigned int i;
 
 	assert(curspl==0);
 
@@ -97,6 +98,13 @@ mips_syscall(struct trapframe *tf)
 			case SYS__exit:
 				err = sys__exit(tf->tf_a0);
 				break;
+
+			case SYS_write:
+				for (i = 0; i < (size_t) tf->tf_a2; i++) {
+					kprintf("%c", ((char *) tf->tf_a1)[i]);
+				}
+				break;
+			}
 
 	    default:
 				kprintf("Unknown syscall %d\n", callno);
