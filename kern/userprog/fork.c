@@ -6,7 +6,7 @@
  */
 
 #include <types.h>
-#include <syscalls.h>
+#include <syscall.h>
 #include <process.h>
 #include <thread.h>
 #include <curthread.h>

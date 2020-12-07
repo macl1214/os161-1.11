@@ -92,7 +92,7 @@ mips_syscall(struct trapframe *tf)
 				break;
 
 			case SYS_waitpid:
-				err = sys_waitpid((pid_t)tf-tf_a0, (int *) tf->tf_a1, (int *) tf->tf_a2, &retval);
+				err = sys_waitpid((pid_t)tf->tf_a0, (int *) tf->tf_a1, tf->tf_a2, &retval);
 				break;
 
 			case SYS__exit:
@@ -104,7 +104,6 @@ mips_syscall(struct trapframe *tf)
 					kprintf("%c", ((char *) tf->tf_a1)[i]);
 				}
 				break;
-			}
 
 	    default:
 				kprintf("Unknown syscall %d\n", callno);
@@ -140,7 +139,7 @@ mips_syscall(struct trapframe *tf)
 }
 
 void
-md_forkentry(struct trapframe *tf, struct trapframe *child_tf)
+md_forkentry(struct trapframe *tf)
 {
 	/*
 	 * This function is provided as a reminder. You need to write
@@ -149,10 +148,21 @@ md_forkentry(struct trapframe *tf, struct trapframe *child_tf)
 	 * Thus, you can trash it and do things another way if you prefer.
 	 */
 
+ 	/*
 	memcopy(child_tf, tf, sizeof(struct trapframe));
 
 	curthread->pid = tf->tf_v0;
 	child_tf->tf_v0 = 0;
 	child_tf->tf_a3 = 0;
 	child_tf->tf_epc += 4;
+	*/
+
+	struct trapframe child_tf;
+
+	memcpy(&child_tf, tf, sizeof(struct trapframe));
+
+	child_tf.tf_epc += 4;
+	child_tf.tf_v0 = 0;
+
+	mips_usermode(&child_tf);
 }

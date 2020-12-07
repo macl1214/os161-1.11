@@ -14,7 +14,6 @@
 #include <vm.h>
 #include <vfs.h>
 #include <test.h>
-#include <string.h>
 
 
 // argv[] needs to have a null string at the end of array
