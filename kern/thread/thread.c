@@ -62,8 +62,8 @@ thread_create(const char *name)
 	// If you add things to the thread structure, be sure to initialize
 	// them here.
 
-	thread->pid = get_pid(thread);
-	thread->ppid = ;
+	thread->pid = process_create(thread);
+	//thread->ppid = ;
 	
 	return thread;
 }
