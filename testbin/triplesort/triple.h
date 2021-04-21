@@ -1,1 +1,1 @@
-../triplehuge/triple.h
+void triple(const char *prog);

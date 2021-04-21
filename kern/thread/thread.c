@@ -482,6 +482,7 @@ thread_yield(void)
 
 	mi_switch(S_READY);
 	splx(spl);
+ /*
  * Yield the cpu to another process, and go to sleep, on "sleep
  * address" ADDR. Subsequent calls to thread_wakeup with the same
  * value of ADDR will make the thread runnable again. The address is
